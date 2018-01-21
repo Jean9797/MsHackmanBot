@@ -43,6 +43,7 @@ public class BotState {
 
     private Field field;
 
+
     BotState() {
         this.field = new Field();
         this.players = new HashMap<>();

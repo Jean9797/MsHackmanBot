@@ -50,6 +50,8 @@ public class Field {
     private ArrayList<Point> bombPositions;
     private ArrayList<Point> tickingBombPositions;
 
+    private int[][] distances;
+
     public Field() {
         this.enemyPositions = new ArrayList<>();
         this.snippetPositions = new ArrayList<>();
@@ -208,6 +210,29 @@ public class Field {
     }
 
     /**
+     * Return a list of valid moves for given position, i.e. moves does not bring
+     * player outside the field or inside a wall
+     * @return A list of valid moves
+     */
+    public ArrayList<MoveType> getPositionValidMoveTypes(Point position) {
+        ArrayList<MoveType> validMoveTypes = new ArrayList<>();
+        int x = position.x;
+        int y = position.y;
+
+        Point up = new Point(x, y - 1);
+        Point down = new Point(x, y + 1);
+        Point left = new Point(x - 1, y);
+        Point right = new Point(x + 1, y);
+
+        if (isPointValid(up)) validMoveTypes.add(MoveType.UP);
+        if (isPointValid(down)) validMoveTypes.add(MoveType.DOWN);
+        if (isPointValid(left)) validMoveTypes.add(MoveType.LEFT);
+        if (isPointValid(right)) validMoveTypes.add(MoveType.RIGHT);
+
+        return validMoveTypes;
+    }
+
+    /**
      * Returns whether a point on the field is valid to stand on.
      * @param point Point to test
      * @return True if point is valid to stand on, false otherwise
@@ -230,10 +255,12 @@ public class Field {
 
     public void setWidth(int width) {
         this.width = width;
+        buildDistances();
     }
 
     public void setHeight(int height) {
         this.height = height;
+        buildDistances();
     }
 
     public Point getMyPosition() {
@@ -258,5 +285,53 @@ public class Field {
 
     public ArrayList<Point> getTickingBombPositions() {
         return this.tickingBombPositions;
+    }
+
+    public int getWidth(){
+        return this.width;
+    }
+
+    public int getHeight(){
+        return this.height;
+    }
+
+    public int getShortestDistance(Point p1, Point p2){
+        return distances[p1.x + p1.y * this.width][p2.x + p2.y * this.width];
+    }
+
+    private void buildDistances(){
+        //algorytm Floyda-Warshalla
+        if(this.width == 0 || this.height == 0) return;
+
+        int vertices = this.width * this.height;
+
+        this.distances = new int[vertices][vertices];
+
+        for(int i = 0; i < vertices; i++){
+            for(int j = 0; j < vertices; j++) distances[i][j] = 500;
+            int i_x = i % this.width;
+            int i_y = i / this.width;
+            if(isPointValid(new Point(i_x, i_y))){
+                distances[i][i] = 0;
+                Point[] neighbours = {new Point(i_x + 1, i_y), new Point(i_x - 1, i_y), new Point(i_x, i_y + 1), new Point(i_x, i_y - 1)};
+                for(Point neighbour : neighbours){
+                    if (isPointValid(neighbour)){
+                        distances[i][neighbour.x + this.width * neighbour.y] = 1;
+                    }
+                }
+            }
+        }
+        distances[(this.height / 2) * this.width][(this.width - 1) + (this.height / 2) * this.width] =
+                distances[(this.width - 1) + (this.height / 2) * this.width][(this.height / 2) * this.width] = 1;   //połączenie tunelu na mapie
+
+        for (int k = 0; k < vertices && isPointValid(new Point(k % this.width, k / this.width)); k++){
+            for (int i = 0; i < vertices && isPointValid(new Point(i % this.width, i / this.width)); i++){
+                for (int j = 0; j < vertices && isPointValid(new Point(j % this.width, j / this.width)); j++){
+                    if (distances[i][j] > distances[i][k] + distances[k][j]){
+                        distances[i][j] = distances[i][k] + distances[k][j];
+                    }
+                }
+            }
+        }
     }
 }

@@ -38,9 +38,11 @@ import player.Player;
 public class BotStarter {
 
     private Random random;
+    private InitialStage initialStage;
 
     private BotStarter() {
         this.random = new Random();
+        this.initialStage = new InitialStage();
     }
 
     /**
@@ -62,6 +64,10 @@ public class BotStarter {
 
         if (validMoveTypes.size() <= 0) {
             return new Move(); // No valid moves, pass
+        }
+
+        if(state.getField().getEnemyPositions().isEmpty()){
+            return this.initialStage.getMove(state);
         }
 
         // Get random but valid move type
