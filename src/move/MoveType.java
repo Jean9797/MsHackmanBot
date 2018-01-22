@@ -49,4 +49,22 @@ public enum MoveType {
             default: return point;
         }
     }
+
+    public static MoveType convertPointsToMoveType(Point p1, Point p2){
+        if (p2.equals(getPointAfterMove(p1, MoveType.UP))){
+            return MoveType.UP;
+        }
+        if (p2.equals(getPointAfterMove(p1, MoveType.DOWN))){
+            return MoveType.DOWN;
+        }
+        if (p2.equals(getPointAfterMove(p1, MoveType.LEFT))){
+            return MoveType.LEFT;
+        }
+        if (p2.equals(getPointAfterMove(p1, MoveType.RIGHT))){
+            return MoveType.RIGHT;
+        }
+        else {
+            throw new IllegalArgumentException("Given points are not close." + p1.toString() + p2.toString());
+        }
+    }
 }

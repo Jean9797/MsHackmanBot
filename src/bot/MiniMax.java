@@ -26,6 +26,7 @@ public class MiniMax {
                     break;  //we don't have to search anymore
                 }
             }
+            node.setScore(score);
             return score;
         }
         else {
@@ -38,6 +39,7 @@ public class MiniMax {
                     break;  //we don't have to search anymore, becouse minimizer will always choose worse state of game than we have had already.
                 }
             }
+            node.setScore(score);
             return score;
         }
     }
@@ -73,12 +75,33 @@ public class MiniMax {
             score += 100;
         }
         for (int i = 0; i < me.getBombs(); i++){
-            score += 10;
+            score += 30;
         }
 
+        int closestSnippetDistance = Integer.MAX_VALUE;
         for (Point snippetPosition : state.getField().getSnippetPositions()){
-
+            int myDistanceToClosestSnippet = state.getField().getShortestDistance(state.getField().getMyPosition(), snippetPosition);
+            int opponentDistanceToThatSnippet = state.getField().getShortestDistance(state.getField().getOpponentPosition(), snippetPosition);
+            if (myDistanceToClosestSnippet < closestSnippetDistance && myDistanceToClosestSnippet < opponentDistanceToThatSnippet){
+                closestSnippetDistance = myDistanceToClosestSnippet;
+            }
         }
-        return 0;
+        if (closestSnippetDistance != Integer.MAX_VALUE){
+            score += 100 - closestSnippetDistance * 2;
+        }
+
+        int closestBombDistance = Integer.MAX_VALUE;
+        for (Point bombPosition : state.getField().getBombPositions()){
+            int myDistanceToClosestBomb = state.getField().getShortestDistance(state.getField().getMyPosition(), bombPosition);
+            int opponentDistanceToThatBomb = state.getField().getShortestDistance(state.getField().getOpponentPosition(), bombPosition);
+            if (myDistanceToClosestBomb < closestBombDistance && myDistanceToClosestBomb < opponentDistanceToThatBomb){
+                closestBombDistance = myDistanceToClosestBomb;
+            }
+        }
+        if (closestBombDistance != Integer.MAX_VALUE){
+            score += 30 - closestBombDistance;
+        }
+
+        return score;
     }
 }
