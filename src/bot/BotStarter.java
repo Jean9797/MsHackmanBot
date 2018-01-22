@@ -39,10 +39,12 @@ public class BotStarter {
 
     private Random random;
     private InitialStage initialStage;
+    private BugsStage bugsStage;
 
     private BotStarter() {
         this.random = new Random();
         this.initialStage = new InitialStage();
+        this.bugsStage = new BugsStage();
     }
 
     /**
@@ -69,19 +71,9 @@ public class BotStarter {
         if(state.getField().getEnemyPositions().isEmpty()){
             return this.initialStage.getMove(state);
         }
-
-        // Get random but valid move type
-        MoveType randomMoveType = validMoveTypes.get(this.random.nextInt(validMoveTypes.size()));
-
-        Player me = state.getPlayers().get(state.getMyName());
-
-        if (me.getBombs() <= 0) {
-            return new Move(randomMoveType); // No bombs available
+        else {
+            return this.bugsStage.getMove(state);
         }
-
-        int bombTicks = this.random.nextInt(4) + 2; // random number 2 - 5
-
-        return new Move(randomMoveType, bombTicks); // Drop bomb if available
     }
 
     public static void main(String[] args) {

@@ -266,6 +266,14 @@ public class Field {
         this.height = height;
     }
 
+    public String getMyId(){
+        return this.myId;
+    }
+
+    public String getOpponentId(){
+        return this.opponentId;
+    }
+
     public Point getMyPosition() {
         return this.myPosition;
     }
@@ -288,6 +296,10 @@ public class Field {
 
     public ArrayList<Point> getTickingBombPositions() {
         return this.tickingBombPositions;
+    }
+
+    public String[][] getField() {
+        return this.field;
     }
 
     public int getWidth(){
@@ -357,5 +369,23 @@ public class Field {
                 System.out.print("\n\n");
             }
         }*/ //wypisywanie odległości do testowania, czy algorytm działa.
+    }
+
+    public Field clone(Field fieldToClone){
+        Field newField = new Field();
+        newField.height = fieldToClone.height;
+        newField.width = fieldToClone.width;
+        newField.myId = fieldToClone.myId;
+        newField.opponentId = fieldToClone.opponentId;
+        newField.distances = fieldToClone.distances;
+        newField.buildDistancesFlag = false;
+        newField.myPosition = (Point) fieldToClone.myPosition.clone();
+        newField.opponentPosition = (Point) fieldToClone.opponentPosition.clone();
+        newField.snippetPositions.addAll(fieldToClone.snippetPositions);
+        newField.enemyPositions.addAll(fieldToClone.enemyPositions);
+        newField.bombPositions.addAll(fieldToClone.bombPositions);
+        newField.tickingBombPositions.addAll(fieldToClone.tickingBombPositions);
+        newField.field = fieldToClone.field.clone();
+        return newField;
     }
 }

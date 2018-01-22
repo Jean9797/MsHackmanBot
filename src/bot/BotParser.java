@@ -108,6 +108,7 @@ public class BotParser {
                     String[] playerNames = value.split(",");
                     for (String playerName : playerNames) {
                         this.currentState.getPlayers().put(playerName, new Player(playerName));
+                        this.currentState.setOpponentName(playerName);  //this will work becouse of the engine.
                     }
                     break;
                 case "your_bot":

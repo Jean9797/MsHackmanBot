@@ -55,4 +55,11 @@ public class Player {
     public String getName() {
         return this.name;
     }
+
+    public Player clone(Player playerToClone){
+        Player newPlayer = new Player(playerToClone.name);
+        newPlayer.bombs = playerToClone.bombs;
+        newPlayer.snippets = playerToClone.snippets;
+        return newPlayer;
+    }
 }
