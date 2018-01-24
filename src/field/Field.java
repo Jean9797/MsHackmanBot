@@ -143,12 +143,8 @@ public class Field {
             }
         }
         if (this.buildDistancesFlag){
-            long startTime = System.currentTimeMillis();
             buildDistances();
             this.buildDistancesFlag = false;
-            long endTime   = System.currentTimeMillis();
-            long totalTime = endTime - startTime;
-            System.out.println(totalTime);
         }
     }
 

@@ -29,6 +29,10 @@ public class Graph {
         return this.vertices.get(position);
     }
 
+    public Field getField() {
+        return field;
+    }
+
     public void clearGraphToBasic() {
         this.vertices.forEach(((point, vertex) -> {
             vertex.clearVertexToBasic();

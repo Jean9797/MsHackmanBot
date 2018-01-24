@@ -25,9 +25,6 @@ public class Vertex {
 
     public void addVertexContent(ObjectType content) {
         this.vertexContent.add(content);
-        if (content == ObjectType.Enemy){
-            addWeight(80);
-        }
     }
 
     public List<Vertex> getNeighbours() {
