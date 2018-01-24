@@ -66,7 +66,7 @@ public class BotStarter {
             return new Move(); // No valid moves, pass
         }
 
-        return this.bugStage.getMove(state.getField());
+        return this.bugStage.getMove(state);
     }
 
     public static void main(String[] args) {

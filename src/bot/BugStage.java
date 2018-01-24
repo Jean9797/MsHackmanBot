@@ -3,15 +3,20 @@ package bot;
 import field.Field;
 import graph.DijkstraAlgorithm;
 import graph.Graph;
+import graph.ObjectType;
 import graph.Vertex;
 import move.Move;
 import move.MoveType;
+import player.Player;
 
 import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class BugStage {
 
-    public Move getMove(Field field){
+    public Move getMove(BotState state){
+        Field field = state.getField();
         Graph myGraph = new Graph(field);
         myGraph.addPresentObjectsOnTheField();
         DijkstraAlgorithm.compute(field.getMyPosition(), myGraph);
@@ -78,6 +83,8 @@ public class BugStage {
 
         MoveType myBestMoveType = MoveType.convertPointsToMoveType(secondVertex.getPosition(), firstVertex.getPosition());
 
+        if (checkIfDropBomb(state, myGraph)) return new Move(myBestMoveType, 2);
+
         return new Move(myBestMoveType);
     }
 
@@ -100,5 +107,58 @@ public class BugStage {
             }
         }
         return closestBugPosition;
+    }
+
+    private boolean checkIfDropBomb(BotState state, Graph graph){
+        Field field = state.getField();
+        Player me = state.getPlayers().get(state.getMyName());
+        if (me.getBombs() < 1) return false;
+
+        Vertex myVertex = graph.getVertexAtPosition(field.getMyPosition());
+        List<MoveType> moveTypes = field.getValidMoveTypes();
+
+        if (!checkIfThereIsSomeoneInRange(field.getMyPosition(), field, moveTypes)) return false;
+
+        return checkIfIsHide(myVertex, moveTypes, field, graph);
+    }
+
+    private boolean checkIfIsHide(Vertex vertex, List<MoveType> moveTypes, Field field, Graph graph){
+        for (MoveType moveType : moveTypes){
+            Point neighbour = MoveType.getPointAfterMove(vertex.getPosition(), moveType);
+            if (!checkIfVertexIsClear(vertex.getVertexContent())) return false;
+            for (MoveType neighbourMoveType : field.getPositionValidMoveTypes(neighbour)){
+                if (neighbourMoveType != moveType && neighbourMoveType != MoveType.getOppositeMoveType(moveType)){
+                    Vertex vertexNextToNeighbour = graph.getVertexAtPosition(MoveType.getPointAfterMove(neighbour, neighbourMoveType));
+                    if (checkIfVertexIsClear(vertexNextToNeighbour.getVertexContent())) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkIfVertexIsClear(List<ObjectType> content){
+        if (content.contains(ObjectType.Enemy) || content.contains(ObjectType.TickingBomb)) return false;
+        return true;
+    }
+
+    private boolean checkIfThereIsSomeoneInRange(Point position, Field field, List<MoveType> moveTypes){
+        List<Point> range = new ArrayList<>();
+        range.add(position);
+        for (MoveType moveType : moveTypes){
+            Point point = MoveType.getPointAfterMove(position, moveType);
+            while (field.isPointValid(point)){
+                range.add(point);
+                point = MoveType.getPointAfterMove(point, moveType);
+            }
+        }
+
+        if (range.contains(field.getOpponentPosition())) return true;
+
+        int i = 0;
+        for (Point enemyPosition : field.getEnemyPositions()){
+            if (range.contains(enemyPosition)) i++;
+        }
+
+        return i > 1;
     }
 }
