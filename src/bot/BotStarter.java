@@ -38,12 +38,10 @@ import player.Player;
 public class BotStarter {
 
     private Random random;
-    private InitialStage initialStage;
     private BugStage bugStage;
 
     private BotStarter() {
         this.random = new Random();
-        this.initialStage = new InitialStage();
         this.bugStage = new BugStage();
     }
 
@@ -69,13 +67,6 @@ public class BotStarter {
         }
 
         return this.bugStage.getMove(state.getField());
-
-        /*if(state.getField().getEnemyPositions().isEmpty()){
-            return this.initialStage.getMove(state);
-        }
-        else {
-            return this.bugStage.getMove(state.getField());
-        }*/
     }
 
     public static void main(String[] args) {

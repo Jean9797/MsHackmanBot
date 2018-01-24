@@ -9,7 +9,6 @@ public class Vertex {
     private List<ObjectType> vertexContent;
     private List<Vertex> neighbours;
     private Point position;
-    private int weight;     //we interpret weight of the edge as weight of second vertex
     private int distanceToVertex;
     private Vertex parent;
 
@@ -39,21 +38,8 @@ public class Vertex {
         return position;
     }
 
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public void addWeight(int weight) {
-        this.weight += weight;
-    }
-
     public void clearVertexToBasic() {
         this.vertexContent.clear();
-        this.weight = 1;
     }
 
     public int getDistanceToVertex() {
@@ -90,7 +76,7 @@ public class Vertex {
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(getWeight() + " " + getDistanceToVertex() + " ");
+        builder.append(distanceToVertex + " ");
 
         builder.append(position.toString() + " ");
 

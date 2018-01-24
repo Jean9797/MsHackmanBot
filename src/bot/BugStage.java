@@ -10,8 +10,6 @@ import move.MoveType;
 import java.awt.*;
 
 public class BugStage {
-    private int myBestDistance = 50000;
-    private Point myBestTarget = null;
 
     public Move getMove(Field field){
         Graph myGraph = new Graph(field);
@@ -22,8 +20,8 @@ public class BugStage {
         opponentGraph.addPresentObjectsOnTheField();
         DijkstraAlgorithm.compute(field.getOpponentPosition(), opponentGraph);
 
-        myBestDistance = 50000;
-        myBestTarget = null;
+        int myBestDistance = 50000;
+        Point myBestTarget = null;
 
         for (Point snippetPosition : field.getSnippetPositions()){
             int myCurrentDistance = myGraph.getVertexAtPosition(snippetPosition).getDistanceToVertex();

@@ -43,8 +43,10 @@ public class DijkstraAlgorithm {
         }
     }
 
+    //here we create edge weight. We create it dynamically
     private static int getNeighbourWeight(Vertex current, Vertex neighbour, Field field){
-        int weight = 1;
+        int weight = 1; //basic weight
+
         //we check direction of bug
         if (neighbour.getVertexContent().contains(ObjectType.Enemy)){
             MoveType moveType = MoveType.convertPointsToMoveType(current.getPosition(), neighbour.getPosition());
@@ -58,8 +60,11 @@ public class DijkstraAlgorithm {
             }
         }
 
+        //for each bug that will come on that position in next round
+        for (int i = 0; i < getNumberOfDirectedNeighbourBugs(neighbour.getPosition(), field); i++) weight += 80;
+
         //for each explosion in time we add another weight
-        for (int i = 0; i < getNumberOfExplosionsAtVertexAffectedByTickingBomb(neighbour, field); i++) weight =+ 80;
+        for (int i = 0; i < getNumberOfExplosionsAtVertexAffectedByTickingBomb(neighbour, field); i++) weight += 80;
 
         return weight;
     }
@@ -84,5 +89,40 @@ public class DijkstraAlgorithm {
             }
         }
         return positions;
+    }
+
+    private static int getNumberOfDirectedNeighbourBugs(Point position, Field field){
+        int numberOfImportantBugs = 0;
+
+        List<Point> neighbourPositions = new ArrayList<>();
+
+        field.getPositionValidMoveTypes(position).forEach(moveType -> {
+            neighbourPositions.add(MoveType.getPointAfterMove(position, moveType));
+        });
+
+        for (Bug bug : field.getBugs()){
+            if (bug.getDirection() != null && neighbourPositions.contains(bug.getPosition())){
+                if (position.equals(MoveType.getPointAfterMove(bug.getPosition(), bug.getDirection()))) {
+                    numberOfImportantBugs++;        //if bug is going to go on the given position we catch this event
+                }
+                else if (checkIfBugIsGoingToPosition(bug, position, field)){
+                    numberOfImportantBugs++;
+                }
+            }
+        }
+
+        return numberOfImportantBugs;
+    }
+
+    private static boolean checkIfBugIsGoingToPosition(Bug bug, Point position, Field field){
+        List<MoveType> moveTypes = field.getPositionValidMoveTypes(bug.getPosition());
+        if (moveTypes.size() != 2) return false;
+
+        //we throw away direction from which bug came
+        MoveType reverseDirection = MoveType.getOppositeMoveType(bug.getDirection());
+        if (reverseDirection == moveTypes.get(0)) moveTypes.remove(1);
+        else moveTypes.remove(0);
+
+        return MoveType.getPointAfterMove(bug.getPosition(), moveTypes.get(0)).equals(position);
     }
 }
