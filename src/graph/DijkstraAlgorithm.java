@@ -11,12 +11,14 @@ public class DijkstraAlgorithm {
 
         //initialization
         graph.getVertices().forEach(((point, vertex) -> {
-            vertex.setDistanceToVertex(500);
+            vertex.setDistanceToVertex(50000);
             vertex.setParent(null);
             priorityQueue.add(vertex);
         }));
 
         startingVertex.setDistanceToVertex(0);
+        if (priorityQueue.remove(startingVertex))
+            priorityQueue.add(startingVertex);
 
         while (!priorityQueue.isEmpty()){
             Vertex current = priorityQueue.poll();
@@ -25,6 +27,8 @@ public class DijkstraAlgorithm {
                 if (neighbour.getDistanceToVertex() > current.getDistanceToVertex() + neighbour.getWeight()){
                     neighbour.setDistanceToVertex(current.getDistanceToVertex() + neighbour.getWeight());
                     neighbour.setParent(current);
+                    if (priorityQueue.remove(neighbour))
+                        priorityQueue.add(neighbour);
                 }
             }
         }

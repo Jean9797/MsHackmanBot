@@ -41,6 +41,9 @@ public enum MoveType {
     }
 
     public static Point getPointAfterMove(Point point, MoveType moveType){
+        //we have to select tunnel case
+        if (point.equals(new Point(0, 7)) && moveType == MoveType.LEFT) return new Point(18, 7);
+        if (point.equals(new Point(18, 7)) && moveType == MoveType.RIGHT) return new Point(0, 7);
         switch(moveType){
             case UP: return new Point(point.x, point.y - 1);
             case DOWN: return new Point(point.x, point.y + 1);

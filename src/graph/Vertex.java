@@ -97,9 +97,9 @@ public class Vertex {
 
         builder.append(position.toString() + " ");
 
-        for (Vertex vertex : neighbours){
-            builder.append(vertex.getPosition().toString() + " ");
-        }
+        if (parent != null)
+            builder.append(parent.getPosition().toString() + " ");
+
         for (ObjectType type : vertexContent){
             builder.append(type.toString() + " ");
         }
