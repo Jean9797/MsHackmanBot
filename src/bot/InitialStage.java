@@ -62,17 +62,6 @@ public class InitialStage {
     }
 
     private int distanceFromPlayerPosition(MoveType moveType, Point playerPosition, Point destination){
-        return state.getField().getShortestDistance(getMovePoint(playerPosition, moveType), destination);
+        return state.getField().getShortestDistance(MoveType.getPointAfterMove(playerPosition, moveType), destination);
     }
-
-    private Point getMovePoint(Point point, MoveType moveType){
-        switch(moveType){
-            case UP: return new Point(point.x, point.y - 1);
-            case DOWN: return new Point(point.x, point.y + 1);
-            case LEFT: return new Point(point.x - 1, point.y);
-            case RIGHT: return new Point(point.x + 1, point.y);
-            default: return point;
-        }
-    }
-
 }

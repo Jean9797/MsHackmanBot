@@ -19,6 +19,8 @@
 
 package move;
 
+import java.awt.*;
+
 /**
  * move.MoveType
  *
@@ -36,5 +38,34 @@ public enum MoveType {
     @Override
     public String toString() {
         return this.name().toLowerCase();
+    }
+
+    public static Point getPointAfterMove(Point point, MoveType moveType){
+        switch(moveType){
+            case UP: return new Point(point.x, point.y - 1);
+            case DOWN: return new Point(point.x, point.y + 1);
+            case LEFT: return new Point(point.x - 1, point.y);
+            case RIGHT: return new Point(point.x + 1, point.y);
+            default: return point;
+        }
+    }
+
+    public static MoveType convertPointsToMoveType(Point p1, Point p2){
+        MoveType[] moveTypes = {MoveType.UP, MoveType.DOWN, MoveType.LEFT, MoveType.RIGHT};
+        for (MoveType type : moveTypes){
+            if (p2.equals(getPointAfterMove(p1, type))) return type;
+        }
+
+        throw new IllegalArgumentException("Given points are not close." + p1.toString() + p2.toString());
+    }
+
+    public static MoveType getOppositeMoveType(MoveType moveType){
+        switch (moveType){
+            case UP: return MoveType.DOWN;
+            case DOWN: return MoveType.UP;
+            case LEFT: return MoveType.RIGHT;
+            case RIGHT: return MoveType.LEFT;
+            default: return moveType;
+        }
     }
 }

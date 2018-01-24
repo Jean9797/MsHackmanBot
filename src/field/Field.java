@@ -49,6 +49,9 @@ public class Field {
     private ArrayList<Point> snippetPositions;
     private ArrayList<Point> bombPositions;
     private ArrayList<Point> tickingBombPositions;
+    private ArrayList<Bug> bugs;
+    private ArrayList<Bug> oldBugs; //it will be usefull for finding bug move direction.
+    private ArrayList<TickingBomb> tickingBombs;
 
     private int[][] distances;
     private boolean buildDistancesFlag = true;
@@ -58,6 +61,9 @@ public class Field {
         this.snippetPositions = new ArrayList<>();
         this.bombPositions = new ArrayList<>();
         this.tickingBombPositions = new ArrayList<>();
+        this.bugs = new ArrayList<>();
+        this.oldBugs = new ArrayList<>();
+        this.tickingBombs = new ArrayList<>();
     }
 
     /**
@@ -90,6 +96,10 @@ public class Field {
         this.snippetPositions.clear();
         this.bombPositions.clear();
         this.tickingBombPositions.clear();
+        this.oldBugs.clear();
+        this.oldBugs = this.bugs;
+        this.bugs = new ArrayList<>();  //we don't want to destroy old bugs
+        this.tickingBombs.clear();
     }
 
     /**
@@ -133,7 +143,7 @@ public class Field {
             }
         }
         if (this.buildDistancesFlag){
-            buildDistances();
+            //buildDistances();
             this.buildDistancesFlag = false;
         }
     }
@@ -161,6 +171,7 @@ public class Field {
      */
     private void parseEnemyCell(char type, int x, int y) {
         this.enemyPositions.add(new Point(x, y));
+        parseBug(new Point(x, y), type);
     }
 
     /**
@@ -179,6 +190,10 @@ public class Field {
             this.bombPositions.add(new Point(x, y));
         } else {
             this.tickingBombPositions.add(new Point(x, y));
+            char ticks = cell.charAt(1);            //we add also to tickingBombs.
+            int numberOfticks = Character.getNumericValue(ticks);
+            TickingBomb tickingBomb = new TickingBomb(new Point(x, y), numberOfticks);
+            this.tickingBombs.add(tickingBomb);
         }
     }
 
@@ -189,6 +204,44 @@ public class Field {
      */
     private void parseSnippetCell(int x, int y) {
         this.snippetPositions.add(new Point(x, y));
+    }
+
+    /**
+     * This method try to set bug move direction. If we don't know direction we chose PASS. If bug is new we chose null.
+     * @param newBugPosition  position of the bug
+     */
+    private void parseBug(Point newBugPosition, char newBugType){
+        Bug enemy = new Bug(newBugPosition, newBugType);
+        enemy.setDirection(null);   //we assume that bug is new one
+        if (oldBugs.isEmpty()){ //we don't have any old bugs so bug is brand new
+            bugs.add(enemy);
+            return;
+        }
+
+        ArrayList<MoveType> possibleMoveTypes = getPositionValidMoveTypes(newBugPosition);
+
+        if (possibleMoveTypes.size() > 2) {
+            enemy.setDirection(MoveType.PASS);  //we don't know which direction bug will chose
+            bugs.add(enemy);
+            return;
+        }
+
+        for (Bug oldBug : this.oldBugs){
+            for (MoveType moveType : possibleMoveTypes){
+                if (checkSpecifiedBugCondition(oldBug, newBugPosition, newBugType, moveType)){
+                    enemy.setDirection(MoveType.convertPointsToMoveType(oldBug.getPosition(), newBugPosition));
+                    bugs.add(enemy);
+                    oldBugs.remove(oldBug); //we don't need him anymore
+                    return;
+                }
+            }
+        }
+
+        bugs.add(enemy);    //we add enemy as brand new, becouse we didn't assume him as PASS and we didn't corresponding old bug.
+    }
+
+    private boolean checkSpecifiedBugCondition(Bug oldBug, Point newBugPosition, char newBugType, MoveType moveType){
+        return MoveType.getPointAfterMove(newBugPosition, moveType).equals(oldBug.getPosition()) && newBugType == oldBug.getType();
     }
 
     /**
@@ -221,6 +274,7 @@ public class Field {
      */
     public ArrayList<MoveType> getPositionValidMoveTypes(Point position) {
         ArrayList<MoveType> validMoveTypes = new ArrayList<>();
+
         int x = position.x;
         int y = position.y;
 
@@ -274,6 +328,10 @@ public class Field {
         return this.opponentPosition;
     }
 
+    public String[][] getBoard() {
+        return this.field;
+    }
+
     public ArrayList<Point> getEnemyPositions() {
         return this.enemyPositions;
     }
@@ -288,6 +346,14 @@ public class Field {
 
     public ArrayList<Point> getTickingBombPositions() {
         return this.tickingBombPositions;
+    }
+
+    public ArrayList<Bug> getBugs() {
+        return this.bugs;
+    }
+
+    public ArrayList<TickingBomb> getTickingBombs() {
+        return this.tickingBombs;
     }
 
     public int getWidth(){
