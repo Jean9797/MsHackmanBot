@@ -29,6 +29,10 @@ public class Graph {
         return this.vertices.get(position);
     }
 
+    public Field getField() {
+        return field;
+    }
+
     public void clearGraphToBasic() {
         this.vertices.forEach(((point, vertex) -> {
             vertex.clearVertexToBasic();
@@ -43,7 +47,6 @@ public class Graph {
                 Point currentPosition = new Point(i, j);
                 if (this.field.isPointValid(currentPosition)){
                     Vertex vertex = new Vertex(currentPosition);
-                    vertex.setWeight(1);    //normal distance between vertices
                     addVertex(vertex);
                 }
             }
@@ -84,10 +87,6 @@ public class Graph {
         }
 
         this.vertices.get(field.getOpponentPosition()).addVertexContent(ObjectType.Player);
-    }
-
-    public void addWeightToVertex(Point position, int weight) {
-        this.vertices.get(position).addWeight(weight);
     }
 
     @Override

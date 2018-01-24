@@ -77,7 +77,6 @@ public class Field {
             throw new Exception("Error: trying to initialize field while field "
                     + "settings have not been parsed yet.");
         }
-        clearField();
     }
 
     /**
@@ -143,9 +142,11 @@ public class Field {
             }
         }
         if (this.buildDistancesFlag){
-            //buildDistances();
+            buildDistances();
             this.buildDistancesFlag = false;
         }
+
+        parseBugs();    //we actualize bugs directions.
     }
 
     /**
@@ -171,7 +172,7 @@ public class Field {
      */
     private void parseEnemyCell(char type, int x, int y) {
         this.enemyPositions.add(new Point(x, y));
-        parseBug(new Point(x, y), type);
+        this.bugs.add(new Bug(new Point(x, y), type));
     }
 
     /**
@@ -206,38 +207,38 @@ public class Field {
         this.snippetPositions.add(new Point(x, y));
     }
 
+    private void parseBugs(){
+        for (Bug bug : bugs){
+            parseBug(bug);
+        }
+    }
+
     /**
      * This method try to set bug move direction. If we don't know direction we chose PASS. If bug is new we chose null.
-     * @param newBugPosition  position of the bug
+     * @param bug
      */
-    private void parseBug(Point newBugPosition, char newBugType){
-        Bug enemy = new Bug(newBugPosition, newBugType);
-        enemy.setDirection(null);   //we assume that bug is new one
+    private void parseBug(Bug bug){
+        bug.setDirection(null);
         if (oldBugs.isEmpty()){ //we don't have any old bugs so bug is brand new
-            bugs.add(enemy);
             return;
         }
 
-        ArrayList<MoveType> possibleMoveTypes = getPositionValidMoveTypes(newBugPosition);
+        ArrayList<MoveType> possibleMoveTypes = getPositionValidMoveTypes(bug.getPosition());
 
         if (possibleMoveTypes.size() > 2) {
-            enemy.setDirection(MoveType.PASS);  //we don't know which direction bug will chose
-            bugs.add(enemy);
+            bug.setDirection(MoveType.PASS);  //we don't know which direction bug will chose
             return;
         }
 
         for (Bug oldBug : this.oldBugs){
             for (MoveType moveType : possibleMoveTypes){
-                if (checkSpecifiedBugCondition(oldBug, newBugPosition, newBugType, moveType)){
-                    enemy.setDirection(MoveType.convertPointsToMoveType(oldBug.getPosition(), newBugPosition));
-                    bugs.add(enemy);
+                if (checkSpecifiedBugCondition(oldBug, bug.getPosition(), bug.getType(), moveType)){
+                    bug.setDirection(MoveType.convertPointsToMoveType(oldBug.getPosition(), bug.getPosition()));
                     oldBugs.remove(oldBug); //we don't need him anymore
                     return;
                 }
             }
         }
-
-        bugs.add(enemy);    //we add enemy as brand new, becouse we didn't assume him as PASS and we didn't corresponding old bug.
     }
 
     private boolean checkSpecifiedBugCondition(Bug oldBug, Point newBugPosition, char newBugType, MoveType moveType){
