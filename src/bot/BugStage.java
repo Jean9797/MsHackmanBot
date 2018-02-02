@@ -46,7 +46,7 @@ public class BugStage {
             }
         }
 
-        //if we have't good snippet of bomb we choose closest one
+        //if we have't good snippet or bomb we choose closest one
         if (myBestTarget == null){
             for (Point snippetPosition : field.getSnippetPositions()){
                 int myCurrentDistance = myGraph.getVertexAtPosition(snippetPosition).getDistanceToVertex();
@@ -90,8 +90,10 @@ public class BugStage {
 
     private Move specialStagnateSituation(Field field){
         Point p1 = closestBugPosition(field, field.getMyPosition());
-        if (field.getShortestDistance(p1, field.getMyPosition()) == 1){
-            return new Move(MoveType.LEFT);
+        if (p1 != null) {
+            if (field.getShortestDistance(p1, field.getMyPosition()) == 1) {
+                return new Move(MoveType.LEFT);
+            }
         }
         return new Move();
     }

@@ -64,15 +64,15 @@ public class DijkstraAlgorithm {
         for (int i = 0; i < getNumberOfDirectedNeighbourBugs(neighbour.getPosition(), field); i++) weight += 80;
 
         //for each explosion in time we add another weight
-        for (int i = 0; i < getNumberOfExplosionsAtVertexAffectedByTickingBomb(neighbour, field); i++) weight += 80;
+        for (int i = 0; i < getNumberOfExplosionsAtVertexAffectedByTickingBomb(current, neighbour, field); i++) weight += 80;
 
         return weight;
     }
 
-    private static int getNumberOfExplosionsAtVertexAffectedByTickingBomb(Vertex vertex, Field field){
+    private static int getNumberOfExplosionsAtVertexAffectedByTickingBomb(Vertex current, Vertex vertex, Field field){
         int numberOfExplosions = 0;
         for (TickingBomb bomb : field.getTickingBombs()){
-            if (vertex.getDistanceToVertex() != bomb.getTicks()) continue;      //we will not be on the place in eruption time
+            if (field.getShortestDistance(current.getPosition(), vertex.getPosition()) != bomb.getTicks()) continue;      //we will not be on the place in eruption time
             if (getPositionsAffectedByBomb(bomb.getPosition(), field).contains(vertex.getPosition())) numberOfExplosions++;
         }
         return numberOfExplosions;
@@ -120,8 +120,8 @@ public class DijkstraAlgorithm {
 
         //we throw away direction from which bug came
         MoveType reverseDirection = MoveType.getOppositeMoveType(bug.getDirection());
-        if (reverseDirection == moveTypes.get(0)) moveTypes.remove(1);
-        else moveTypes.remove(0);
+        if (reverseDirection == moveTypes.get(0)) moveTypes.remove(0);
+        else moveTypes.remove(1);
 
         return MoveType.getPointAfterMove(bug.getPosition(), moveTypes.get(0)).equals(position);
     }
